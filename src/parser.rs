@@ -1,7 +1,4 @@
-use std::{
-    collections::HashMap,
-    io::{BufRead, Read},
-};
+use std::{collections::HashMap, io::BufRead};
 
 use crate::lexer::Token;
 pub fn parser(tokens: Vec<Token>) {
