@@ -1,0 +1,14 @@
+Input      /Takes user input
+Store X    /Stores user input to X
+Input      /Takes user input
+Store Y    /Stores user input to Y
+Load X     /Load X to AC
+Add Y     /Add Y to X
+Store Z    /Store addition to Z
+Output     /Print Z
+HALT       /End program
+
+/Variable decleration
+Z, HEX 0
+X, HEX 0
+Y, HEX 0
