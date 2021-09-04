@@ -1,12 +1,13 @@
 use core::panic;
 use std::num::ParseIntError;
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Conditions {
     Equal,
     Greater,
     Less,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
+
 pub enum Token {
     Clear,
     Add(char),
@@ -64,7 +65,7 @@ fn extract_variable(token: &str, v_type: &str) -> (char, i64) {
         (char_name, *i)
     }
 }
-pub(crate) fn lex(lines: Vec<String>) -> Vec<Token> {
+pub fn lex(lines: Vec<String>) -> Vec<Token> {
     let mut ast = Vec::new();
     let removed_comments = remove_comments(lines);
     for line in removed_comments.into_iter() {
