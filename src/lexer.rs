@@ -73,6 +73,15 @@ pub(crate) fn lex(lines: Vec<String>) -> Vec<Token> {
             "OUTPUT" => ast.push(Token::Output),
             "HALT" => ast.push(Token::Halt),
             "CLEAR" => ast.push(Token::Clear),
+            x if x.contains("SKIPCOND") => {
+                let c = extract_argument(x, "SKIPCOND");
+                match c {
+                    '0' => ast.push(Token::Skipcond(Conditions::Less)),
+                    '4' => ast.push(Token::Skipcond(Conditions::Equal)),
+                    '8' => ast.push(Token::Skipcond(Conditions::Greater)),
+                    _ => panic!("Invalid Argument to Skipcond"),
+                }
+            }
             x if x.contains("ADD") => ast.push(Token::Add(extract_argument(x, "ADD"))),
             x if x.contains("STORE") => ast.push(Token::Store(extract_argument(x, "STORE"))),
             x if x.contains("SUBT") => ast.push(Token::Subt(extract_argument(x, "SUBT"))),
