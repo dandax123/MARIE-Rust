@@ -1,4 +1,5 @@
 use core::panic;
+use std::num::ParseIntError;
 #[derive(Debug)]
 pub enum Conditions {
     Equal,
@@ -16,7 +17,13 @@ pub enum Token {
     Output,
     Skipcond(Conditions),
     Halt,
-    Variable(char, char, i32),
+    Variable(char, i64),
+}
+
+fn convert_hex_to_dec(raw: &str) -> Result<i64, ParseIntError> {
+    let without_prefix = raw.trim_start_matches("0x");
+    let z = i64::from_str_radix(without_prefix, 16)?;
+    Ok(z)
 }
 
 fn remove_comments(lines: Vec<String>) -> Vec<String> {
@@ -37,6 +44,26 @@ fn extract_argument(x: &str, ops: &str) -> char {
         .next()
         .expect(&format!("{} requires an additional argument !!!", ops)[..]);
 }
+fn extract_variable(token: &str, v_type: &str) -> (char, i64) {
+    let tokens: Vec<String> = token.split(v_type).map(|x| x.trim().to_string()).collect();
+    let val = tokens
+        .get(1)
+        .expect("Please provide a value for the variable");
+    let char_name = tokens
+        .get(0)
+        .unwrap()
+        .to_uppercase()
+        .chars()
+        .nth(0)
+        .expect("A variable must be named");
+    if v_type == "hex" {
+        let k = convert_hex_to_dec(&val[..]).expect("Invalid Hex number");
+        (char_name, k)
+    } else {
+        let i = &val[..].parse::<i64>().expect("Invalid Decimal Number");
+        (char_name, *i)
+    }
+}
 pub(crate) fn lex(lines: Vec<String>) -> Vec<Token> {
     let mut ast = Vec::new();
     let removed_comments = remove_comments(lines);
@@ -50,6 +77,14 @@ pub(crate) fn lex(lines: Vec<String>) -> Vec<Token> {
             x if x.contains("STORE") => ast.push(Token::Store(extract_argument(x, "STORE"))),
             x if x.contains("SUBT") => ast.push(Token::Subt(extract_argument(x, "SUBT"))),
             x if x.contains("LOAD") => ast.push(Token::Load(extract_argument(x, "LOAD"))),
+            x if x.contains("HEX") => {
+                let (c, i) = extract_variable(&x.to_lowercase()[..], "hex");
+                ast.push(Token::Variable(c, i))
+            }
+            x if x.contains("DEC") => {
+                let (c, i) = extract_variable(&x.to_lowercase()[..], "dec");
+                ast.push(Token::Variable(c, i))
+            }
             x => println!("Unknown token {}", x),
         }
     }

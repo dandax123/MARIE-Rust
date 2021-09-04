@@ -9,6 +9,6 @@ Output     /Print Z
 HALT       /End program
 
 /Variable decleration
-Z, HEX 0
+Z, HEX 0x04
 X, HEX 0
 Y, HEX 0

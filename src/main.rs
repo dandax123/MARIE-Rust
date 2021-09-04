@@ -1,7 +1,10 @@
 mod file;
 mod lexer;
 use file::extract_lines_from_file;
+use hex;
 use lexer::lex;
+use std::i64;
+
 // use std::env;
 
 fn main() {
