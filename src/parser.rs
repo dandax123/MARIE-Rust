@@ -4,10 +4,9 @@ use crate::lexer::Token;
 pub fn parser(tokens: Vec<Token>) {
     let mut accum: i64 = 0;
     let mut symbol_table: HashMap<String, i64> = tokens
-        .clone()
-        .into_iter()
+        .iter()
         .filter_map(|d| match d {
-            Token::Variable(c, i) => Some((c.to_string(), i)),
+            Token::Variable(c, i) => Some((c.to_string(), *i)),
             _ => None,
         })
         .collect();
