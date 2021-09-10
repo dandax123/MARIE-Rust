@@ -1,0 +1,14 @@
+Input 
+Store X
+Input
+Store Y
+Load X
+Subt Y
+Skipcond 000
+Load Y
+Load X
+Output 
+Halt
+
+X, DEC 0
+Y, DEC 0

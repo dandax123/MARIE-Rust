@@ -10,14 +10,12 @@ pub fn parser(tokens: Vec<Token>) {
             _ => None,
         })
         .collect();
-    let instruction_tokens: Vec<Token> = tokens
-        .into_iter()
-        .filter(|x| match x {
-            Token::Variable(_, _) => false,
-            _ => true,
-        })
-        .collect();
-    for instr in instruction_tokens.into_iter() {
+    let mut instruction_tokens = tokens.into_iter().filter(|x| match x {
+        Token::Variable(_, _) => false,
+        _ => true,
+    });
+    while let Some(instr) = instruction_tokens.next() {
+        println!("{:?}", instr);
         match instr {
             Token::Input => {
                 accum = take_input().expect("Unable to take input");
@@ -47,6 +45,22 @@ pub fn parser(tokens: Vec<Token>) {
                     .get(&c.to_string())
                     .expect("Variable doesn't exist");
                 accum -= *val;
+            }
+            Token::Skipcond(crate::lexer::Conditions::Less) => {
+                println!("{:?}", accum);
+                if accum < 0 {
+                    instruction_tokens.nth(0);
+                }
+            }
+            Token::Skipcond(crate::lexer::Conditions::Equal) => {
+                if accum == 0 {
+                    instruction_tokens.nth(0);
+                }
+            }
+            Token::Skipcond(crate::lexer::Conditions::Greater) => {
+                if accum > 0 {
+                    instruction_tokens.nth(0);
+                }
             }
             Token::Halt => (),
             _ => (),
