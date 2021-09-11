@@ -6,26 +6,37 @@ To learn all about MARIE: <a href="http://www.cs.uni.edu/~fienup/cs041s11/lectur
 
 `cargo run [FILENAME]`
 
-Example `[FILENAME]`:
+Example `program to square a number`:
 
 ```
-Input      /Takes user input
-Store X    /Stores user input to X
-Input      /Takes user input
-Store Y    /Stores user input to Y
-Load X     /Load X to AC
-Add Y     /Add Y to X
-Store Z    /Store addition to Z
-Output     /Print Z
-HALT       /End program
+Input
+Store X
+Store Y
+Store G
 
-/Variable decleration
-Z, HEX 0x04
-X, HEX 0
-Y, HEX 0
+Loop, Load Y / load y
+Subt Z /accum = y - 1
+Store Y
+Skipcond 400
+Jump Square
+Jump End
 
+Square, Load X
+Add G
+Store X
+Jump Loop
+
+End, Load X
+Output
+Halt
+
+X, Dec 0
+Y, Dec 0
+G, Dec 0
+Z, Dec 1
 ```
 
 TODO:
 
-1. Add support for `JNS`, `JUMP` and functions
+1. Add support for `JUMP`, `SkipCond` and functions (Done)
+2. Add support for `JNS`, `LOADI`, `ADDI`
