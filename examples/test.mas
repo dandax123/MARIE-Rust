@@ -1,0 +1,19 @@
+Input      /Takes user input
+SKIPCOND 800 /cool skipcond
+Output     /Print Z
+if, Input
+Load Y
+Subt X
+Add Z
+cool, Output
+Load X
+nice, Input
+Load H
+Input
+k, Output
+/HALT       
+
+/Variable decleration
+Z, HEX 0x04
+X, HEX 0
+Y, HEX 0

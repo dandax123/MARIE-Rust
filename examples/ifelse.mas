@@ -6,7 +6,7 @@
 /		Unlike the body of the if statment we don't need to `JUMP`; instead we can continue.
 / #L11	If `EXP` is not 0 then then SKIPCOND will not skip over #L12 forcing a `JUMP`.
 
-		ORG			0
+ORG			0
 
 if,		LOAD 		EXP			/ LOAD EXP into AC
 		SKIPCOND	400			/ SKIPCOND 400 (if AC = 0)

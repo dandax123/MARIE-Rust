@@ -6,19 +6,21 @@ pub enum Conditions {
     Greater,
     Less,
 }
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 
 pub enum Token {
     Clear,
-    Add(char),
-    Subt(char),
-    Load(char),
-    Store(char),
+    Add(String),
+    Subt(String),
+    Load(String),
+    Store(String),
     Input,
     Output,
     Skipcond(Conditions),
     Halt,
-    Variable(char, i64),
+    Variable(String, i64),
+    Jump(String),
+    Function(String, Box<Vec<Token>>),
 }
 
 fn convert_hex_to_dec(raw: &str) -> Result<i64, ParseIntError> {
@@ -27,76 +29,135 @@ fn convert_hex_to_dec(raw: &str) -> Result<i64, ParseIntError> {
     Ok(z)
 }
 
-fn remove_comments(lines: Vec<String>) -> Vec<String> {
-    return lines
-        .into_iter()
-        .map(|x| x.split("/").nth(0).expect("msg").trim().to_string())
-        .filter(|x| !x.is_empty())
-        .collect();
-}
-fn extract_argument(x: &str, ops: &str) -> char {
-    return x
-        .split(ops)
-        .nth(1)
-        .unwrap()
-        .trim()
-        .to_string()
-        .chars()
-        .next()
-        .expect(&format!("{} requires an additional argument !!!", ops)[..]);
-}
-fn extract_variable(token: &str, v_type: &str) -> (char, i64) {
-    let tokens: Vec<String> = token.split(v_type).map(|x| x.trim().to_string()).collect();
-    let val = tokens
-        .get(1)
-        .expect("Please provide a value for the variable");
-    let char_name = tokens
-        .get(0)
-        .unwrap()
-        .to_uppercase()
-        .chars()
-        .nth(0)
-        .expect("A variable must be named");
-    if v_type == "hex" {
-        let k = convert_hex_to_dec(&val[..]).expect("Invalid Hex number");
-        (char_name, k)
-    } else {
-        let i = &val[..].parse::<i64>().expect("Invalid Decimal Number");
-        (char_name, *i)
+fn extract_argument(x: Option<&&str>, ops: &str) -> String {
+    match x {
+        Some(&x) => x.to_string(),
+        _ => panic!("{} requires an additional argument !!!", ops),
     }
 }
-pub fn lex(lines: Vec<String>) -> Vec<Token> {
+fn parse_number(val: Option<&str>, v_type: &str) -> i64 {
+    match val {
+        Some(val) => {
+            if v_type == "hex" {
+                let k = convert_hex_to_dec(&val[..]).expect("Invalid Hex number");
+                k
+            } else {
+                let i = &val[..].parse::<i64>().expect("Invalid Decimal Number");
+                *i
+            }
+        }
+        _ => panic!("variable requires a number"),
+    }
+}
+
+fn extract_function_name(x: &str) -> String {
+    x.split(",")
+        .nth(0)
+        .expect("A function must be named")
+        .to_uppercase()
+}
+fn calculate_fn_length(x: &str) -> (String, usize) {
+    let x: Vec<&str> = x.split(" ").take_while(|x| !x.contains(",")).collect();
+    (x.join(" "), x.len())
+}
+pub fn lex(mut words: String, depth: i32) -> Vec<Token> {
     let mut ast = Vec::new();
-    let removed_comments = remove_comments(lines);
-    for line in removed_comments.into_iter() {
-        match &line.to_uppercase()[..] {
+    let words_clone = words.clone();
+    let mut words = words.split(" ").peekable();
+    let mut in_function = false;
+    // println!("{:?}", words);
+    while let Some(word) = words.next() {
+        match &word.to_uppercase()[..] {
+            "" => continue,
             "INPUT" => ast.push(Token::Input),
             "OUTPUT" => ast.push(Token::Output),
             "HALT" => ast.push(Token::Halt),
             "CLEAR" => ast.push(Token::Clear),
             x if x.contains("SKIPCOND") => {
-                let c = extract_argument(x, "SKIPCOND");
-                match c {
-                    '0' => ast.push(Token::Skipcond(Conditions::Less)),
-                    '4' => ast.push(Token::Skipcond(Conditions::Equal)),
-                    '8' => ast.push(Token::Skipcond(Conditions::Greater)),
-                    _ => panic!("Invalid Argument to Skipcond"),
+                if let Some(&x) = words.peek() {
+                    match x {
+                        "000" => ast.push(Token::Skipcond(Conditions::Less)),
+                        "400" => ast.push(Token::Skipcond(Conditions::Equal)),
+                        "800" => ast.push(Token::Skipcond(Conditions::Greater)),
+                        y=> panic!(
+                            "Invalid Argument given ({}) to  Skipcond !!! USAGE Skipcond [000, 800, 400]", y
+                        ),
+                    }
+                    words.nth(0);
+                } else {
+                    panic!("Provide an argument to skipcond");
                 }
             }
-            x if x.contains("ADD") => ast.push(Token::Add(extract_argument(x, "ADD"))),
-            x if x.contains("STORE") => ast.push(Token::Store(extract_argument(x, "STORE"))),
-            x if x.contains("SUBT") => ast.push(Token::Subt(extract_argument(x, "SUBT"))),
-            x if x.contains("LOAD") => ast.push(Token::Load(extract_argument(x, "LOAD"))),
-            x if x.contains("HEX") => {
-                let (c, i) = extract_variable(&x.to_lowercase()[..], "hex");
-                ast.push(Token::Variable(c, i))
+            x if x.contains("ADD") => {
+                ast.push(Token::Add(extract_argument(words.peek(), "ADD")));
+                words.nth(0);
             }
-            x if x.contains("DEC") => {
-                let (c, i) = extract_variable(&x.to_lowercase()[..], "dec");
-                ast.push(Token::Variable(c, i))
+            x if x.contains("STORE") => {
+                ast.push(Token::Store(extract_argument(words.peek(), "STORE")));
+                words.nth(0);
             }
-            x => println!("Unknown token {}", x),
+            x if x.contains("SUBT") => {
+                ast.push(Token::Subt(extract_argument(words.peek(), "SUBT")));
+                words.nth(0);
+            }
+            x if x.contains("LOAD") => {
+                ast.push(Token::Load(extract_argument(words.peek(), "LOAD")));
+                words.nth(0);
+            }
+            x if x.contains("JUMP") => {
+                ast.push(Token::Jump(extract_argument(words.peek(), "JUMP")));
+                words.nth(0);
+            }
+            x if x.contains("ORG") => continue,
+            x if x.contains(",") => {
+                if let Some(&y) = words.peek() {
+                    match &y.to_uppercase()[..] {
+                        "DEC" => {
+                            ast.push(Token::Variable(
+                                extract_function_name(x),
+                                parse_number(words.nth(1), "dec"),
+                            ));
+                        }
+                        "HEX" => {
+                            ast.push(Token::Variable(
+                                extract_function_name(x),
+                                parse_number(words.nth(1), "hex"),
+                            ));
+                        }
+                        y => {
+                            let fn_begin = words_clone.clone().to_uppercase().find(x);
+                            match fn_begin {
+                                Some(i) => {
+                                    let remain = &words_clone[(i + x.len() + 1)..];
+                                    let (funtion_string, skip_length) = calculate_fn_length(remain);
+                                    // println!(" {} {:?} {} ", remain, funtion_string, skip_length);
+                                    let t = lex(funtion_string, 1);
+                                    ast.push(Token::Function(
+                                        extract_function_name(x),
+                                        Box::new(t),
+                                    ));
+                                    words.nth(skip_length - 1);
+                                }
+                                _ => panic!("impossible"),
+                            }
+                            // function world
+                        }
+                    }
+                } else {
+                    panic!("Functions or variables require arguments");
+                }
+            }
+
+            x => println!("Unknown token here {}", x),
+        }
+        if let Some(&x) = words.peek() {
+            if x.contains(",") && depth == 1 {
+                return ast;
+            }
+        } else {
+            continue;
         }
     }
+    println!("{:?}", ast);
     ast
 }
