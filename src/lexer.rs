@@ -31,7 +31,7 @@ fn convert_hex_to_dec(raw: &str) -> Result<i64, ParseIntError> {
 
 fn extract_argument(x: Option<&&str>, ops: &str) -> String {
     match x {
-        Some(&x) => x.to_string(),
+        Some(&x) => x.to_uppercase(),
         _ => panic!("{} requires an additional argument !!!", ops),
     }
 }
@@ -60,11 +60,10 @@ fn calculate_fn_length(x: &str) -> (String, usize) {
     let x: Vec<&str> = x.split(" ").take_while(|x| !x.contains(",")).collect();
     (x.join(" "), x.len())
 }
-pub fn lex(mut words: String, depth: i32) -> Vec<Token> {
+pub fn lex(words: String, depth: i32) -> Vec<Token> {
     let mut ast = Vec::new();
     let words_clone = words.clone();
     let mut words = words.split(" ").peekable();
-    let mut in_function = false;
     // println!("{:?}", words);
     while let Some(word) = words.next() {
         match &word.to_uppercase()[..] {
@@ -108,7 +107,10 @@ pub fn lex(mut words: String, depth: i32) -> Vec<Token> {
                 ast.push(Token::Jump(extract_argument(words.peek(), "JUMP")));
                 words.nth(0);
             }
-            x if x.contains("ORG") => continue,
+            x if x.contains("ORG") => {
+                words.nth(0);
+                continue;
+            }
             x if x.contains(",") => {
                 if let Some(&y) = words.peek() {
                     match &y.to_uppercase()[..] {
@@ -124,7 +126,7 @@ pub fn lex(mut words: String, depth: i32) -> Vec<Token> {
                                 parse_number(words.nth(1), "hex"),
                             ));
                         }
-                        y => {
+                        _ => {
                             let fn_begin = words_clone.clone().to_uppercase().find(x);
                             match fn_begin {
                                 Some(i) => {
@@ -158,6 +160,5 @@ pub fn lex(mut words: String, depth: i32) -> Vec<Token> {
             continue;
         }
     }
-    println!("{:?}", ast);
     ast
 }

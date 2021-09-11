@@ -1,19 +1,27 @@
-Input      /Takes user input
-SKIPCOND 800 /cool skipcond
-Output     /Print Z
-if, Input
-Load Y
-Subt X
-Add Z
-cool, Output
-Load X
-nice, Input
-Load H
-Input
-k, Output
-/HALT       
+        / program to get integers X and N then display
+        /    results of shifting X left by N bits
+        org         100
+        input                / get value of X
+        store       X
+        input                / get value of N
+        store       N
+While,  load        N        / compute N-I
+        subt        I
+        skipcond    800      / if it's positive we're not done
+        jump        Done
+        load        X        / double X
+        add         X
+        store       X
+        load        I        / increment I
+        add         Incr
+        store       I
+        jump        While    / go back to loop test
 
-/Variable decleration
-Z, HEX 0x04
-X, HEX 0
-Y, HEX 0
+Done,   load        X        / we're done, print X
+        output
+        halt
+
+X,      dec         0        / value being shifted
+N,      dec         0        / number of bits to shift
+I,      dec         0        / loop counter
+Incr,   dec         1        / I += 1 each pass

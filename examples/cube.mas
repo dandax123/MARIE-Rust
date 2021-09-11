@@ -1,0 +1,25 @@
+Input 
+Store X
+Store Y
+Store G
+
+Loop, Load Y / load y 
+Subt Z /accum = y - 1
+Store Y
+Skipcond 400
+Jump Square
+Jump End
+
+Square, Load X
+Add G
+Store X
+Jump Loop
+
+End, Load X
+Output
+Halt
+
+X, Dec 0
+Y, Dec 0
+G, Dec 0
+Z, Dec 1

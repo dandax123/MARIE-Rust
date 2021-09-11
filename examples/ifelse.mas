@@ -11,10 +11,10 @@ ORG			0
 if,		LOAD 		EXP			/ LOAD EXP into AC
 		SKIPCOND	400			/ SKIPCOND 400 (if AC = 0)
 		JUMP		else		/ JUMP to `else`
-		LOAD		IVALUE  	/ LOAD IVALUE into AC
-		OUTPUT					/ OUTPUT value IVALUE
-		JUMP		end			/ JUMP to `end`
-
+		Load EXP
+		OUTPUT
+		Output
+		
 else,	LOAD		EVALUE		/ LOAD IVALUE into AC
 		OUTPUT					/ OUTPUT value IVALUE
 

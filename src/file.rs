@@ -17,9 +17,7 @@ fn remove_comments(lines: Vec<String>) -> Vec<String> {
         .filter(|x| !x.is_empty())
         .collect();
 }
-fn remove_whitespace(s: &str) -> String {
-    s.chars().filter(|c| !c.is_whitespace()).collect()
-}
+
 pub fn extract_token(x: Vec<String>) -> String {
     let removed_comments = remove_comments(x);
     // println!("{:?}", removed_comments);
@@ -37,6 +35,5 @@ pub fn extract_token(x: Vec<String>) -> String {
         })
         .collect();
     let j = y.join("");
-    println!("{}", j);
     j
 }
