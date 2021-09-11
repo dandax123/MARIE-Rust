@@ -1,0 +1,57 @@
+       / get two integers, N, D, from user
+        / compute and display results of N div D
+        org         100
+        input
+        store       N       / get user value for N
+        input
+        store       D       / get user value for D
+        load        N       / K = N
+        store       K
+        
+Outer,  load        K       / not done if K is positive
+        skipcond    800
+        jump        Done    / otherwise we're finished
+        load        Incr    / Pow = 1
+        store       Pow
+        load        D       / J = D
+        store       J
+
+Inner,  load        J       / not done if 2J < K
+        add         J
+        subt        K
+        skipcond    000
+        jump        AftIn   / leave inner loop
+        load        J       / J = 2*J
+        add         J
+        store       J
+        load        Pow     / Pow = 2*Pow
+        add         Pow
+        store       Pow
+        
+        jump        Inner   / back to top of inner loop
+        
+AftIn,  load        K       / K = K - J
+        subt        J
+        store       K
+        load        Answer  / Answer = Answer + Pow
+        add         Pow
+        store       Answer
+                
+        jump        Outer   / back to top of outer loop
+
+Done,   load        K       / if K < 0 answer--
+        skipcond    000
+        jump        Disp
+        load        Answer
+        subt        Incr
+Disp,   load        Answer  / we're done, display the results
+        output
+        halt
+        
+N,      dec         0       / user value for N
+D,      dec         0       / user value for D
+K,      dec         0       / amount of N still left
+J,      dec         0       / current multiple of D
+Pow,    dec         0       / computing powers of 2
+Answer, dec         0       / final result
+Incr,   dec         1       / for ++ --

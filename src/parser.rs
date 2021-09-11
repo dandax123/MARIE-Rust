@@ -13,6 +13,7 @@ pub fn parser(
     });
 
     while let Some(instr) = instruction_tokens.next() {
+        // println!("Current Instruction: {:?}", instr);
         match instr {
             Token::Input => {
                 accum = take_input().expect("Unable to take input");
@@ -38,7 +39,6 @@ pub fn parser(
                 accum -= *val;
             }
             Token::Skipcond(crate::lexer::Conditions::Less) => {
-                println!("{}", accum);
                 if accum < 0 {
                     instruction_tokens.nth(0);
                 }

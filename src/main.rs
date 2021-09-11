@@ -26,6 +26,6 @@ fn main() {
             _ => None,
         })
         .collect();
-    // println!("{:?}", tokens);
+    // println!("{:?}", variable_table);
     parser(tokens, 0, variable_table, function_table);
 }

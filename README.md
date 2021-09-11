@@ -36,6 +36,8 @@ G, Dec 0
 Z, Dec 1
 ```
 
+To run other examples, visit the `examples\working` directory !!! </br>
+
 TODO:
 
 1. Add support for `JUMP`, `SkipCond` and functions (Done)

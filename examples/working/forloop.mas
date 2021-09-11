@@ -3,7 +3,7 @@ Cond,	LOAD		COUNT		/ LOAD count into AC
 		SUBT		TEN			/ SUBTRACT 10 from AC
 		SKIPCOND	000			/ Skipcond 000 if AC < 0
 		JUMP		End			/ JUMP to End
-
+		Jump 		Loop
 Loop,	LOAD		COUNT		/ LOAD Count into AC
 		ADD			ONE			/ ADD ONE to AC
 		STORE		COUNT		/ STORE AC into COUNT
