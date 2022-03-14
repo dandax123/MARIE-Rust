@@ -1,4 +1,4 @@
-# MARIE compiler in rust
+# MARIE compiler and interpreter
 
 To learn all about MARIE: <a href="http://www.cs.uni.edu/~fienup/cs041s11/lectures/Supplement_MARE_AL.pdf"> read more... </a>
 
