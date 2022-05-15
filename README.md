@@ -5,8 +5,11 @@ To learn all about MARIE: <a href="http://www.cs.uni.edu/~fienup/cs041s11/lectur
 ### Usage
 
 `cargo run [FILENAME]`
+To run other examples, visit the `examples\working` directory
 
-Example `program to square a number`:
+### Example 
+
+MARIE program to square a number:
 
 ```
 Input
@@ -36,7 +39,7 @@ G, Dec 0
 Z, Dec 1
 ```
 
-To run other examples, visit the `examples\working` directory !!! </br>
+
 
 TODO:
 
